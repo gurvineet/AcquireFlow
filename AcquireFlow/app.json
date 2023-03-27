@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "AcquireFlow",
-    "slug": "AcquireFlow",
+    "name": "growth-gateway",
+    "slug": "growth-gateway",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

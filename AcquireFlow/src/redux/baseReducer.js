@@ -11,9 +11,12 @@ const baseReducer = (typeAdd, typeDelete, typeUpdate) => (state = { items: [] },
           ...state,
           items: state.items.map((item, index) => (index === action.payload.index ? action.payload.item : item)),
         };
+      case 'SET_USERNAME':
+        return { ...state, user: { ...state.user, username: action.payload.name } };
       default:
         return state;
     }
   };
   
-  export default baseReducer;  
+  export default baseReducer;
+  

@@ -10,12 +10,26 @@ const MainNavigator = () => {
   return (
     <Stack.Navigator>
       {Object.entries(screenDataMap).map(([screenKey, screenData]) => {
-        const ScreenComponent = withGenericScreen(BaseScreen, screenData);
+        const ScreenComponent = withGenericScreen(
+          BaseScreen,
+          screenData.plugins,
+          screenData.data
+        );
         return (
           <Stack.Screen
             key={screenKey}
             name={screenKey}
             component={ScreenComponent}
+            options={{
+              title: screenData.data.title,
+              headerStyle: {
+                backgroundColor: '#f4511e',
+              },
+              headerTintColor: '#fff',
+              headerTitleStyle: {
+                fontWeight: 'bold',
+              },
+            }}
           />
         );
       })}

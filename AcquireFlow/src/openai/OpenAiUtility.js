@@ -1,7 +1,7 @@
 // src/openai/OpenAiUtility.js
-import OpenAI from 'openai'; // Assume you're using the 'openai' package
+import OpenAI from 'openai-api';
 
-const openai = new OpenAI('your_api_key');
+const openai = new OpenAI('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');
 
 const generateText = async (prompt, options = {}) => {
   const defaultOptions = {
@@ -17,7 +17,7 @@ const generateText = async (prompt, options = {}) => {
     prompt,
   };
 
-  const response = await openai.Completion.create(requestOptions);
+  const response = await openai.complete(requestOptions);
   return response.choices[0].text.trim();
 };
 

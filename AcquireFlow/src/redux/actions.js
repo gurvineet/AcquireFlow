@@ -37,3 +37,8 @@ export const updateTask = (index, task) => ({
   type: UPDATE_TASK,
   payload: { index, task },
 });
+
+export const setUsername = (name) => ({
+  type: 'SET_USERNAME',
+  payload: { name },
+});
