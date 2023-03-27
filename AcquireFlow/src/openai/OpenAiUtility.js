@@ -1,7 +1,7 @@
 // src/openai/OpenAiUtility.js
 import OpenAI from 'openai-api';
 
-const openai = new OpenAI('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');
+const openai = new OpenAI('*');
 
 const generateText = async (prompt, options = {}) => {
   const defaultOptions = {
