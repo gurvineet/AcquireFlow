@@ -24,7 +24,7 @@ export default {
   },
   useRedux: () => {
     // Define how the plugin interacts with Redux
-    const username = useSelector((state) => state.user.username);
+    const username = useSelector((state) => state.username);
     const dispatch = useDispatch();
 
     const onUpdateUsername = (name) => {
