@@ -1,18 +1,19 @@
 // src/openai/OpenAiUtility.js
 import axios from 'axios';
-const apiKey = '*';
+const apiKey = process.env.OPENAI_API_KEY;
 
 export const suggestGoals = async (existingGoals) => {
 
-  const prompt = `Given the following existing goals:\n- ${existingGoals.join('\n- ')}\n\nSuggest new goals:`;
+  const prompt = `Given the following existing goals:\n- ${existingGoals.join('\n- ')}\n\n Suggest new goals:`;
   try {
     const response = await axios.post(
       'https://api.openai.com/v1/completions',
       {
         "model": "text-davinci-003",
         "prompt": prompt,
-        "max_tokens": 50,
-        "temperature": 0
+        "max_tokens": 20,
+        "temperature": 0.7,
+        "top_p": 5,
       },
       {
         headers: {
@@ -21,10 +22,12 @@ export const suggestGoals = async (existingGoals) => {
         },
       }
     );
-
+    print(response.data)
     const suggestions = response.data.choices.map((choice) => choice.text.trim());
+    print(suggestions)
     return suggestions;
   } catch (error) {
+    print(error)
     console.error('Error getting goal suggestions:', error);
     throw error;
   }

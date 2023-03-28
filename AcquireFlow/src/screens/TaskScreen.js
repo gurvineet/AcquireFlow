@@ -1,44 +1,60 @@
-// src/screens/TaskScreen.js
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, TextInput } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { useDispatch, useSelector } from 'react-redux';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import withGenericScreen from '../components/withGenericScreen';
 import taskPlugin from '../plugins/taskPlugin';
-import { useNavigation } from '@react-navigation/native';
+import { colors, spacing } from '../theme';
 
-const TaskScreen = (props) => {
+const TaskScreen = () => {
   const navigation = useNavigation();
+  const dispatch = useDispatch();
+  const { getSuggestedTasks } = taskPlugin.useOpenAi(dispatch);
   const [newTask, setNewTask] = useState('');
+  const tasks = useSelector((state) => state.tasks);
+  const selectedGoal = useSelector((state) => state.selectedGoal);
 
   const handleAddTask = () => {
     if (newTask.trim().length > 0) {
-      props.onAddTask({ goalId: props.goalId, task: newTask.trim() });
+      taskPlugin.useRedux(dispatch).onAddTask({ goalId: selectedGoal.id, task: newTask.trim() });
       setNewTask('');
     }
   };
 
   return (
-    <View>
-      <Text>Task Screen Content</Text>
-      <TextInput
-        value={newTask}
-        onChangeText={setNewTask}
-        placeholder="Enter a new task"
-        style={taskPlugin.styles.input}
-      />
-      <TouchableOpacity onPress={handleAddTask} style={taskPlugin.styles.button}>
-        <Text style={taskPlugin.styles.buttonText}>Add Task</Text>
-      </TouchableOpacity>
-      {props.tasks
-        .filter((task) => task.goalId === props.goalId)
-        .map((task, index) => (
-          <Text key={index}>{task.task}</Text>
-        ))}
-      <TouchableOpacity
-        onPress={() => navigation.navigate('GoalScreen')}
-        style={taskPlugin.styles.button}
-      >
-        <Text style={taskPlugin.styles.buttonText}>Go to Goals</Text>
-      </TouchableOpacity>
+    <View style={taskPlugin.styles.container}>
+      <View style={taskPlugin.styles.header}>
+        <Text style={taskPlugin.styles.title}>{selectedGoal.title}</Text>
+        <TouchableOpacity onPress={getSuggestedTasks} style={taskPlugin.styles.iconButton}>
+          <MaterialCommunityIcons name="lightbulb-on-outline" size={25} color={colors.white} />
+        </TouchableOpacity>
+      </View>
+      <View style={taskPlugin.styles.taskListContainer}>
+        {tasks
+          .filter((task) => task.goalId === selectedGoal.id)
+          .map((task, index) => (
+            <View style={taskPlugin.styles.taskListItem} key={index}>
+              <MaterialCommunityIcons
+                name="checkbox-blank-circle-outline"
+                size={20}
+                color={colors.darkGray}
+              />
+              <Text style={taskPlugin.styles.taskListItemText}>{task.task}</Text>
+            </View>
+          ))}
+      </View>
+      <View style={taskPlugin.styles.inputContainer}>
+        <TouchableOpacity onPress={handleAddTask} style={taskPlugin.styles.iconButton}>
+          <MaterialCommunityIcons name="plus" size={25} color={colors.white} />
+        </TouchableOpacity>
+        <TextInput
+          value={newTask}
+          onChangeText={setNewTask}
+          placeholder="Enter a new task"
+          style={taskPlugin.styles.input}
+        />
+      </View>
     </View>
   );
 };

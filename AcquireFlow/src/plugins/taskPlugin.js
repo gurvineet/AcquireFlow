@@ -1,71 +1,107 @@
 // src/plugins/taskPlugin.js
 
-import { useSelector, useDispatch } from "react-redux";
-import { addTask, deleteTask, updateTask } from "../redux/reducers/tasks";
-import { suggestTasks } from "../openai/OpenAiUtility";
-import { StyleSheet } from 'react-native';
+import { useSelector, useDispatch } from 'react-redux';
+import { addTask, deleteTask, updateTask } from '../redux/reducers/tasks';
+import { suggestTasks } from '../openai/OpenAiUtility';
 
-export default {
-  screenName: "Tasks",
+const taskPlugin = {
+  screenName: 'Task',
   screenData: {
-    title: "Tasks",
-    description: "Manage your tasks and track your progress.",
+    title: 'Tasks',
+    description: 'Complete tasks to achieve your goals...',
   },
   additionalComponents: {
-    // Add custom components for the tasks screen here, if needed
+    // Add custom components for the task screen here, if needed
   },
-  useOpenAi: () => {
-    const tasks = useSelector((state) => state.tasks.items);
-    const dispatch = useDispatch();
-
-    const getSuggestedTasks = async (goal) => {
-      try {
-        const suggestions = await suggestTasks(goal, tasks);
-        suggestions.forEach((suggestion) => {
-          dispatch(addTask({ goal, task: suggestion }));
-        });
-      } catch (error) {
-        console.error('Error getting task suggestions:', error);
-      }
+  useOpenAi: (dispatch) => {
+    // Define how the plugin interacts with OpenAI
+    const suggestNewTask = async (userInput) => {
+      const task = await suggestTasks(userInput);
+      return task;
     };
 
-    return { getSuggestedTasks };
+    return { suggestNewTask };
   },
-  useRedux: () => {
-    const tasks = useSelector((state) => state.tasks.items);
-    const dispatch = useDispatch();
+  useRedux: (dispatch) => {
+    // Define how the plugin interacts with Redux
+    const tasks = useSelector((state) => state.tasks);
 
-    const onAddTask = (taskData) => {
-      dispatch(addTask(taskData));
+    const onAddTask = ({ goalId, task }) => {
+      dispatch(addTask({ goalId, task }));
     };
 
-    const onDeleteTask = (taskId) => {
-      dispatch(deleteTask(taskId));
+    const onDeleteTask = (task) => {
+      dispatch(deleteTask(task));
     };
 
-    const onUpdateTask = (taskId, taskData) => {
-      dispatch(updateTask(taskId, taskData));
+    const onUpdateTask = (task) => {
+      dispatch(updateTask(task));
     };
 
-    return { tasks, onAddTask, onDeleteTask, onUpdateTask };
+    return { tasks, onAddTask };
   },
-  styles: StyleSheet.create({
+  styles: {
     input: {
       borderWidth: 1,
-      borderColor: '#000',
-      borderRadius: 4,
-      padding: 8,
-      marginBottom: 8,
+      borderColor: '#ccc',
+      padding: 10,
+      margin: 10,
+      borderRadius: 5,
+      fontSize: 18,
+      fontFamily: 'Avenir',
+      fontWeight: 'bold',
     },
     button: {
-      backgroundColor: '#1E90FF',
-      padding: 8,
-      borderRadius: 4,
-      marginBottom: 8,
+      backgroundColor: '#2196F3',
+      padding: 10,
+      margin: 10,
+      borderRadius: 5,
+      alignItems: 'center',
     },
     buttonText: {
-      color: '#FFF',
-      textAlign: 'center',
+      color: 'white',
+      fontSize: 18,
+      fontFamily: 'Avenir',
+      fontWeight: 'bold',
     },
-  }),
+    taskContainer: {
+      borderWidth: 1,
+      borderColor: '#ccc',
+      padding: 10,
+      margin: 10,
+      borderRadius: 5,
+      flexDirection: 'row',
+      alignItems: 'center',
+    },
+    taskText: {
+      fontSize: 18,
+      fontFamily: 'Avenir',
+      marginLeft: 10,
+    },
+    checkIcon: {
+      color: '#2196F3',
+      fontSize: 24,
+    },
+    suggestionButton: {
+      backgroundColor: '#2196F3',
+      padding: 10,
+      margin: 10,
+      borderRadius: 5,
+      alignItems: 'center',
+      flexDirection: 'row',
+    },
+    suggestionButtonText: {
+      color: 'white',
+      fontSize: 18,
+      fontFamily: 'Avenir',
+      fontWeight: 'bold',
+      marginLeft: 10,
+    },
+    suggestionIcon: {
+      color: 'white',
+      fontSize: 24,
+    },
+  },
 };
+
+export default taskPlugin;
