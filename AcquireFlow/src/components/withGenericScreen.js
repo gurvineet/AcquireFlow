@@ -1,53 +1,28 @@
+// src/components/withGenericScreen.js
+
 import React from 'react';
-import { connect } from 'react-redux';
-import { useOpenAi } from '../openai/OpenAiUtility';
+import BaseScreen from './BaseScreen';
 
-const withGenericScreen = (
-  WrappedComponent,
-  screenData,
-  additionalComponents = {},
-  useOpenAi = () => {},
-  useRedux = () => {}
-) => {
-  const ScreenComponent = (props) => {
-    const openAi = useOpenAi();
-    const { username, onUpdateUsername } = useRedux();
+const withGenericScreen = (WrappedComponent, screenData, additionalComponents, useOpenAi, useRedux) => {
+  return (props) => {
+    const openAiProps = useOpenAi ? useOpenAi() : {};
+    const reduxProps = useRedux ? useRedux() : {};
 
-    const additionalComponentsProps = Object.entries(
-      additionalComponents
-    ).reduce(
-      (acc, [componentName, component]) => ({
-        ...acc,
-        [componentName]: React.createElement(component, {
-          ...props,
-          ...openAi,
-          ...{ username, onUpdateUsername },
-        }),
-      }),
-      {}
+    const additionalProps = {
+      ...openAiProps,
+      ...reduxProps,
+    };
+
+    return (
+      <>
+        <BaseScreen title={screenData.title} description={screenData.description} />
+        <WrappedComponent {...props} {...additionalProps} />
+        {Object.values(additionalComponents || {}).map((Component, index) => (
+          <Component key={index} {...props} {...additionalProps} />
+        ))}
+      </>
     );
-
-    return React.createElement(WrappedComponent, {
-      ...props,
-      ...screenData,
-      ...openAi,
-      ...{ username, onUpdateUsername },
-      ...additionalComponentsProps,
-    });
   };
-
-  const mapStateToProps = (state) => ({
-    username: state.user.username,
-  });
-
-  const mapDispatchToProps = {
-    onUpdateUsername: (name) => ({
-      type: 'SET_USERNAME',
-      payload: { name },
-    }),
-  };
-
-  return connect(mapStateToProps, mapDispatchToProps)(ScreenComponent);
 };
 
 export default withGenericScreen;

@@ -1,38 +1,27 @@
-import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
-import { screenDataMap } from '../data';
-import BaseScreen from '../components/BaseScreen';
-import withGenericScreen from '../components/withGenericScreen';
+// src/navigators/MainNavigator.js
 
-const Stack = createStackNavigator();
+import React from 'react';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import screens from '../screens';
+
+const Stack = createNativeStackNavigator();
 
 const MainNavigator = () => {
   return (
-    <Stack.Navigator>
-      {Object.entries(screenDataMap).map(([screenKey, screenData]) => {
-        const ScreenComponent = withGenericScreen(
-          BaseScreen,
-          screenData.plugins,
-          screenData.data
-        );
-        return (
-          <Stack.Screen
-            key={screenKey}
-            name={screenKey}
-            component={ScreenComponent}
-            options={{
-              title: screenData.data.title,
-              headerStyle: {
-                backgroundColor: '#f4511e',
-              },
-              headerTintColor: '#fff',
-              headerTitleStyle: {
-                fontWeight: 'bold',
-              },
-            }}
-          />
-        );
-      })}
+    <Stack.Navigator
+      screenOptions={{
+        headerStyle: {
+          backgroundColor: '#f4511e',
+        },
+        headerTintColor: '#fff',
+        headerTitleStyle: {
+          fontWeight: 'bold',
+        },
+      }}
+    >
+      {Object.keys(screens).map((key) => (
+        <Stack.Screen key={key} name={key} component={screens[key]} />
+      ))}
     </Stack.Navigator>
   );
 };
