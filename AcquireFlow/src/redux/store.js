@@ -1,8 +1,12 @@
-// src/redux/store.js
+import { configureStore } from '@reduxjs/toolkit';
+import goalsReducer from './reducers/goals';
+import tasksReducer from './reducers/tasks';
 
-import { createStore } from "redux";
-import rootReducer from "./reducers";
-
-const store = createStore(rootReducer);
+const store = configureStore({
+  reducer: {
+    goals: goalsReducer,
+    tasks: tasksReducer,
+  },
+});
 
 export default store;

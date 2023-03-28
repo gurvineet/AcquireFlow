@@ -1,42 +1,59 @@
 // src/openai/OpenAiUtility.js
-import OpenAI from 'openai-api';
+import axios from 'axios';
+const apiKey = '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';
 
-const openai = new OpenAI('*');
+export const suggestGoals = async (existingGoals) => {
 
-const generateText = async (prompt, options = {}) => {
-  const defaultOptions = {
-    model: 'text-davinci-002',
-    maxTokens: 50,
-    n: 1,
-    temperature: 0.7,
-  };
+  const prompt = `Given the following existing goals:\n- ${existingGoals.join('\n- ')}\n\nSuggest new goals:`;
+  try {
+    const response = await axios.post(
+      'https://api.openai.com/v1/completions',
+      {
+        "model": "text-davinci-003",
+        "prompt": prompt,
+        "max_tokens": 50,
+        "temperature": 0
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+      }
+    );
 
-  const requestOptions = {
-    ...defaultOptions,
-    ...options,
-    prompt,
-  };
-
-  const response = await openai.complete(requestOptions);
-  return response.choices[0].text.trim();
+    const suggestions = response.data.choices.map((choice) => choice.text.trim());
+    return suggestions;
+  } catch (error) {
+    console.error('Error getting goal suggestions:', error);
+    throw error;
+  }
 };
 
-export const suggestInitialGoals = async (userInput) => {
-  const prompt = `Given the user's interests: ${userInput}, suggest some initial goals for them to pursue:`;
-  const suggestions = await generateText(prompt);
-  return suggestions.split('\n');
+export const suggestTasks = async (goal, existingTasks) => {
+  const prompt = `Given the goal "${goal}" and the following existing tasks:\n- ${existingTasks.join('\n- ')}\n\nSuggest new tasks:`;
+  try {
+    const response = await axios.post(
+      'https://api.openai.com/v1/completions',
+      {
+        "model": "text-davinci-003",
+        "prompt": prompt,
+        "max_tokens": 50,
+        "temperature": 0
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+        },
+      }
+    );
+
+    const suggestions = response.data.choices.map((choice) => choice.text.trim());
+    return suggestions;
+  } catch (error) {
+    console.error('Error getting task suggestions:', error);
+    throw error;
+  }
 };
 
-export const suggestTasksForGoal = async (goal) => {
-  const prompt = `Suggest tasks to help the user achieve the goal: ${goal}`;
-  const suggestions = await generateText(prompt);
-  return suggestions.split('\n');
-};
-
-export const provideGuidanceForTask = async (task) => {
-  const prompt = `Provide guidance and tips for completing the task: ${task}`;
-  const guidance = await generateText(prompt);
-  return guidance;
-};
-
-// Add other functions for different scenarios

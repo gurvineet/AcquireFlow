@@ -1,8 +1,9 @@
 // src/plugins/goalPlugin.js
 
 import { useSelector, useDispatch } from "react-redux";
-import { addGoal, deleteGoal, updateGoal } from "../redux/actions";
+import { addGoal, deleteGoal, updateGoal } from "../redux/reducers/goals";
 import { suggestGoals } from "../openai/OpenAiUtility";
+import { StyleSheet } from 'react-native';
 
 export default {
   screenName: "Goals",
@@ -10,20 +11,25 @@ export default {
     title: "Goals",
     description: "Manage your goals and track your progress.",
   },
-  additionalComponents: {
-    // Add custom components for the goals screen here, if needed
-  },
+  additionalComponents: {},
   useOpenAi: () => {
-    // Define how the plugin interacts with OpenAI
-    const getGoalSuggestions = async (userInput) => {
-      const suggestedGoals = await suggestGoals(userInput);
-      return suggestedGoals;
+    const goals = useSelector((state) => state.goals.items);
+    const dispatch = useDispatch();
+
+    const getSuggestedGoals = async () => {
+      try {
+        const suggestions = await suggestGoals(goals);
+        suggestions.forEach((suggestion) => {
+          dispatch(addGoal(suggestion));
+        });
+      } catch (error) {
+        console.error('Error getting goal suggestions:', error);
+      }
     };
 
-    return { getGoalSuggestions };
+    return { getSuggestedGoals };
   },
   useRedux: () => {
-    // Define how the plugin interacts with Redux
     const goals = useSelector((state) => state.goals.items);
     const dispatch = useDispatch();
 
@@ -41,4 +47,23 @@ export default {
 
     return { goals, onAddGoal, onDeleteGoal, onUpdateGoal };
   },
+  styles: StyleSheet.create({
+    input: {
+      borderWidth: 1,
+      borderColor: '#000',
+      borderRadius: 4,
+      padding: 8,
+      marginBottom: 8,
+    },
+    button: {
+      backgroundColor: '#1E90FF',
+      padding: 8,
+      borderRadius: 4,
+      marginBottom: 8,
+    },
+    buttonText: {
+      color: '#FFF',
+      textAlign: 'center',
+    },
+  }),
 };
