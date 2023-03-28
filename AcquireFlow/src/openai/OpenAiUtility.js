@@ -1,6 +1,6 @@
 // src/openai/OpenAiUtility.js
 import axios from 'axios';
-const apiKey = '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';
+const apiKey = '*';
 
 export const suggestGoals = async (existingGoals) => {
 
